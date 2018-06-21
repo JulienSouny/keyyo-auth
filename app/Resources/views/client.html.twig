@@ -1,0 +1,21 @@
+<h1>
+	Profiles :
+</h1>
+
+{% block body %}
+    {% for profile in profiles %}
+	<form action="/action_page.php" method="POST">
+		Name:
+		<br>
+			<input type="text" name="name" value={{ profile.csi }}>
+		<br>
+		Csi:
+		<br>
+			<input type="text" name="csi" value={{ profile.name }}>
+		<br><br>
+		<input type="submit" value="Submit">
+	</form> 
+	{% else %}
+	<li>No users.</li>
+    {% endfor %}
+{% endblock %}

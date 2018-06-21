@@ -20,7 +20,7 @@
         "sensio/framework-extra-bundle": "^3.0.2",
         "sensio/generator-bundle": "~2.3",
         "incenteev/composer-parameter-handler": "~2.0",
-        "Keyyo/keyyo-manager-php-client": "~1.0",
+        "keyyo/manager-client": "*"
     },
     "scripts": {
         "post-install-cmd": [
@@ -43,7 +43,7 @@
     "config": {
         "bin-dir": "bin"
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "extra": {
         "symfony-app-dir": "app",
         "symfony-web-dir": "web",

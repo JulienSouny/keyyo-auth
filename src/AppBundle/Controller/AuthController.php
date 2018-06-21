@@ -38,18 +38,11 @@ class AuthController extends Controller
      */
     public function getToken(Request $request)
     {
-    	// authenticate endpoint
-    	$keyyo_token_endpoint = "https://ssl.keyyo.com/oauth2/token.php";
+    	require_once __DIR__ . '/../config.php';
+    	// var_dump($refresh_token);
+    	// die();
 
-    	$client_id = "5b261b47eba27";
-		$client_secret = "44001c168b7fefdcc2b8420d";
-    	$grant_type = "authorization_code";
-    	//$state = "05db09c4a4cada2b4e87568d81f3bbc4";
-    	$redirect_uri = "https://galsen-services.com/callback";
-    	//$code = "7e559e8c45cff1ba8ad5645c85d9add4a4bc2381";
-    	$refresh_token = "7421e2f4486e4ddb6b02014bf9af25511954c59a";
-    	$token = "HY3ZCsIwFET/Jc8FTW6qRvChrRUEpS6NolYkjd20KjaJC+K/G3ybmXNgPugotEB9tEuQm5IOTmk3SwXpJsixS4+0Af4xN3V9EFJmStmOXcKghwEzhxIg2CFWkUbp2yVrLL9ae48cpKriKrRpMvswDefBOKBnricsMgsVRqNwsWxP/W3wekP55PHaPzfsWHl65UHaeJV3UuqtZWx4XNJhVN3gwcp4RnTO65Ny4T4TJmklLSrFhheDAfr+AA==";
-    
+    	$keyyo_token_endpoint = 'https://api.keyyo.com/oauth2/token.php';
   
 		// Send a cURL request using request"s authorization code
 		$curl = curl_init($keyyo_token_endpoint);
@@ -68,14 +61,13 @@ class AuthController extends Controller
 
 		// Retrieve the access token
 
-		var_dump(json_decode($auth_data));
-		die();
+		return new Response(json_decode($auth_data, 1)["access_token"]);
     }
 
 
 
-    $token = "HY3ZCsIwFET/Jc8FTW6qRvChrRUEpS6NolYkjd20KjaJC+K/G3ybmXNgPugotEB9tEuQm5IOTmk3SwXpJsixS4+0Af4xN3V9EFJmStmOXcKghwEzhxIg2CFWkUbp2yVrLL9ae48cpKriKrRpMvswDefBOKBnricsMgsVRqNwsWxP/W3wekP55PHaPzfsWHl65UHaeJV3UuqtZWx4XNJhVN3gwcp4RnTO65Ny4T4TJmklLSrFhheDAfr+AA==";
-    $refresh_token = "7421e2f4486e4ddb6b02014bf9af25511954c59a";
+    //$token = "HY3ZCsIwFET/Jc8FTW6qRvChrRUEpS6NolYkjd20KjaJC+K/G3ybmXNgPugotEB9tEuQm5IOTmk3SwXpJsixS4+0Af4xN3V9EFJmStmOXcKghwEzhxIg2CFWkUbp2yVrLL9ae48cpKriKrRpMvswDefBOKBnricsMgsVRqNwsWxP/W3wekP55PHaPzfsWHl65UHaeJV3UuqtZWx4XNJhVN3gwcp4RnTO65Ny4T4TJmklLSrFhheDAfr+AA==";
+    //$refresh_token = "7421e2f4486e4ddb6b02014bf9af25511954c59a";
 
 
     /**
@@ -84,10 +76,49 @@ class AuthController extends Controller
      */
     public function indexAction()
     {
+    	session_start();
+
+		require_once __DIR__ . '/../config.php';
+
+		$keyyo_authorize_endpoint = 'https://ssl.keyyo.com/oauth2/authorize.php';
+
+		$_SESSION["oauth_state"] = uniqid();
+		// Redirect the browser< to Keyyo's login/authorization form
+		$authorize_url = sprintf("%s?client_id=%s&response_type=code&state=%s&redirect_uri=%s", $keyyo_authorize_endpoint, $client_id, $_SESSION["oauth_state"], $redirect_uri);
+
+		header('Location: ' . $authorize_url);
+
+		$_SESSION["status"] = "ok";
+		
+		die();
+    }
+
+
+    /**
+     * @Route("/callback", name="callback")
+     * @Method({"GET"})
+     */
+    public function callbackAction()
+    {
+    	//session_start();
+
+		require_once __DIR__ . '/../config.php';
+
+		var_dump('hello');
+
+		$keyyo_authorize_endpoint = 'https://ssl.keyyo.com/oauth2/authorize.php';
+
+		$_SESSION["oauth_state"] = uniqid();
+		// Redirect the browser to Keyyo's login/authorization form
+		$authorize_url = sprintf("%s?client_id=%s&response_type=code&state=%s&redirect_uri=%s", $keyyo_authorize_endpoint, $client_id, $_SESSION["oauth_state"], $redirect_uri);
+		//var_dump($authorize_url);
+		header('Location: ' . $authorize_url);
+		
+		// exit();
     	// Basic formular
-        return $this->render(
-            'index.html.twig'
-        );   
+        // return $this->render(
+        //     'index.html.twig'
+        // );   
 
     }
 
