@@ -4,14 +4,14 @@
 
 {% block body %}
     {% for profile in profiles %}
-	<form action="/action_page.php" method="POST">
+	<form action="/client" method="POST">
 		Name:
 		<br>
-			<input type="text" name="name" value={{ profile.csi }}>
+			<input type="text" name="name" value={{ profile.name }}>
 		<br>
 		Csi:
 		<br>
-			<input type="text" name="csi" value={{ profile.name }}>
+			<input type="text" name="csi" value={{ profile.csi }}>
 		<br><br>
 		<input type="submit" value="Submit">
 	</form> 
