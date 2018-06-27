@@ -4,7 +4,7 @@
 
 {% block body %}
     {% for profile in profiles %}
-	<form action="/client" method="POST">
+	<form action="/client" method="POST" name="">
 		Name:
 		<br>
 			<input type="text" name="name" value={{ profile.name }}>

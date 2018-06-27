@@ -17,26 +17,40 @@ class ClientController extends Controller
      */
     public function getClientInfo(Request $request)
     {
-    	// included for test
-    	require_once __DIR__ . '/../config.php';
+        try {
+            // included for test
+            require_once __DIR__ . '/../config.php';
 
-		// Instantiate a Manager client (version 1.0 here)
-		$keyyo_manager = new \Keyyo\Manager\Client('1.0', $access_token);
+            $access_token = $_SESSION["access_token"];
 
-		// // Retrieve all services from the authenticated customer
-		$services = $keyyo_manager->services();
+            // Instantiate a Manager client (version 1.0 here)
+            $keyyo_manager = new \Keyyo\Manager\Client('1.0', $access_token);
 
-		$profiles = [];
-		$i = 0;
-		foreach ($services as $service) {
-    		$profiles[$i]["csi"] = $service->csi;
-			$profiles[$i]["name"] = $service->name;
-			$i++;
-		}
+            // // Retrieve all services from the authenticated customer
+            $services = $keyyo_manager->services();
 
-        return $this->render('client.html.twig', [
-            'profiles' => $profiles,
-        ]);
+            $profiles = [];
+            $i = 0;
+            foreach ($services as $service) {
+                $profiles[$i]["csi"] = $service->csi;
+                $profiles[$i]["name"] = $service->name;
+                $i++;
+            }
+
+            return $this->render('client.html.twig', [
+                'profiles' => $profiles,
+            ]);            
+        }
+        catch (Exception $e) {
+            $response = new Response(
+                json_encode([
+                    'status'  => 'error',
+                    'message' => $e->getMessage()
+                ]),
+                400
+            );
+        }
+
     }
 
 
@@ -47,37 +61,37 @@ class ClientController extends Controller
      */
     public function postClientInfo(Request $request)
     {
-        // included for test
         require_once __DIR__ . '/../config.php';
-
-        var_dump(count($_POST) == 0);
-        var_dump(count($_GET) == 0);
-
-
-        if ($_POST["name"] != "") {
-
-        };
-
-        var_dump($services->name);
-
-        $services->__set('name','Pierrot');
-
-        var_dump($services->name);
+        ini_set('display_errors', 1);
+        $access_token = $_SESSION["access_token"];
 
 
         // Instantiate a Manager client (version 1.0 here)
         $keyyo_manager = new \Keyyo\Manager\Client('1.0', $access_token);
 
-        // // Retrieve all services from the authenticated customer
+        if ($_POST["name"] != "") {
+            $keyyo_manager->services($_POST["csi"])->__set('name', $_POST["name"]);
+        }
+
+        // Retrieve all services from the authenticated customer
         $services = $keyyo_manager->services();
+
+
+        //var_dump($services);
+        //die();
 
         $profiles = [];
         $i = 0;
+
+        // var_dump($services);
+        // die();
+
         foreach ($services as $service) {
             $profiles[$i]["csi"] = $service->csi;
             $profiles[$i]["name"] = $service->name;
             $i++;
         }
+
 
         return $this->render('client.html.twig', [
             'profiles' => $profiles,

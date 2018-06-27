@@ -42,32 +42,44 @@ class AuthController extends Controller
     	// var_dump($refresh_token);
     	// die();
 
-    	$keyyo_token_endpoint = 'https://api.keyyo.com/oauth2/token.php';
+        try {
+            $keyyo_token_endpoint = 'https://api.keyyo.com/oauth2/token.php';
   
-		// Send a cURL request using request"s authorization code
-		$curl = curl_init($keyyo_token_endpoint);
-		curl_setopt($curl, CURLOPT_POST, true);
-		curl_setopt($curl, CURLOPT_POSTFIELDS, array(
-			"client_id"     => $client_id,
-			"client_secret" => $client_secret,
-			"grant_type"    => "refresh_token",
-			"redirect_uri"	=> $redirect_uri,
-			"refresh_token"	=> $refresh_token
-		));
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+            // Send a cURL request using request"s authorization code
+            $curl = curl_init($keyyo_token_endpoint);
+            curl_setopt($curl, CURLOPT_POST, true);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, array(
+                "client_id"     => $client_id,
+                "client_secret" => $client_secret,
+                "grant_type"    => "refresh_token",
+                "redirect_uri"  => $redirect_uri,
+                "refresh_token" => $refresh_token
+            ));
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
-		$auth_data = curl_exec($curl);
+            $auth_data = curl_exec($curl);
 
+            file_put_contents(__DIR__ . '/../access_token', json_decode($auth_data, 1)["access_token"]);
 
-		// Retrieve the access token
-
-		return new Response(json_decode($auth_data, 1)["access_token"]);
+            $response = new Response(
+                json_encode([
+                    'status'  => 'success',
+                    'message' => 'access token updated successfully'
+                ]),
+                200
+            );
+            return $response;
+        }
+        catch (Exception $e) {
+            $response = new Response(
+                json_encode([
+                    'status'  => 'error',
+                    'message' => $e->getMessage()
+                ]),
+                401
+            );
+        }
     }
-
-
-
-    //$token = "HY3ZCsIwFET/Jc8FTW6qRvChrRUEpS6NolYkjd20KjaJC+K/G3ybmXNgPugotEB9tEuQm5IOTmk3SwXpJsixS4+0Af4xN3V9EFJmStmOXcKghwEzhxIg2CFWkUbp2yVrLL9ae48cpKriKrRpMvswDefBOKBnricsMgsVRqNwsWxP/W3wekP55PHaPzfsWHl65UHaeJV3UuqtZWx4XNJhVN3gwcp4RnTO65Ny4T4TJmklLSrFhheDAfr+AA==";
-    //$refresh_token = "7421e2f4486e4ddb6b02014bf9af25511954c59a";
 
 
     /**
@@ -85,6 +97,8 @@ class AuthController extends Controller
 		$_SESSION["oauth_state"] = uniqid();
 		// Redirect the browser< to Keyyo's login/authorization form
 		$authorize_url = sprintf("%s?client_id=%s&response_type=code&state=%s&redirect_uri=%s", $keyyo_authorize_endpoint, $client_id, $_SESSION["oauth_state"], $redirect_uri);
+
+        $_SESSION["access_token"] = file_get_contents(__DIR__ . '/../access_token');
 
 		header('Location: ' . $authorize_url);
 
